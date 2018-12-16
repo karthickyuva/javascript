@@ -7,62 +7,74 @@
  - The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
  - The first player to reach 100 points on GLOBAL score wins the game
 
+ 1. A player looses his ENTIRE score when he rolls two 6 in a row. After that, it's the next player's turn. (Hint: Always save the previous dice roll in a separate variable)
+
  */
 
 var scores, roundedScore, activePlayer, gamePlaying;
 
-	// Init function New/Start Game
-	init();
+// Init function New/Start Game
+init();
 
-	document.querySelector('.btn-roll').addEventListener('click', function () {
-		if (gamePlaying) {
-			// Random number
-			var dice = Math.floor(Math.random() * 6 + 1);
-			var diceDom = document.querySelector('.dice');
+var lastDice;
 
-			// Display Result
-			diceDom.style.display = 'block';
-			diceDom.src = 'dice-' + dice + '.png';
+document.querySelector('.btn-roll').addEventListener('click', function () {
+	if (gamePlaying) {
+		// Random number
+		var dice = Math.floor(Math.random() * 6 + 1);
+		var diceDom = document.querySelector('.dice');
+		console.log('dice', dice);
 
-			//Update the rounded score if the rolled number is NOT 1
-			document.querySelector('#current-' + activePlayer).innerHTML = roundedScore;
+		// Display Result
+		diceDom.style.display = 'block';
+		diceDom.src = 'dice-' + dice + '.png';
 
-			if (dice !== 1) {
-				// Add Score
-				// roundedScore = roundedScore + dice;
-				roundedScore += dice;
-				document.getElementById('current-' + activePlayer).textContent = roundedScore;
-			} else {
-				// Next Player
-				nextPlayer();
-			}
-		}
+		//Update the rounded score if the rolled number is NOT 1
+		document.querySelector('#current-' + activePlayer).innerHTML = roundedScore;
 
-	});
-
-
-	document.querySelector('.btn-hold').addEventListener('click', function () {
-		if (gamePlaying) {
-			// Add current score to Global score
-			scores[activePlayer] += roundedScore;
-
-			// Update the UI
+		if (lastDice === 6 && dice === 6) {
+			//player rolles two 6 in a row. Reset to next player
+			scores[activePlayer] = 0;
 			document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
-
-			// Check if the player won the game
-			if (scores[activePlayer] >= 20) {
-				document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
-				document.querySelector('.dice').style.display = 'none';
-				document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
-				document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
-				gamePlaying = false;
-			} else {
-				//Next Player
-				nextPlayer();
-			}
+			nextPlayer();
+		} else if (dice !== 1) {
+			// Add Score
+			// roundedScore = roundedScore + dice;
+			roundedScore += dice;
+			document.getElementById('current-' + activePlayer).textContent = roundedScore;
+		} else {
+			// Next Player
+			nextPlayer();
 		}
 
-	});
+		lastDice = dice;
+	}
+
+});
+
+
+document.querySelector('.btn-hold').addEventListener('click', function () {
+	if (gamePlaying) {
+		// Add current score to Global score
+		scores[activePlayer] += roundedScore;
+
+		// Update the UI
+		document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
+
+		// Check if the player won the game
+		if (scores[activePlayer] >= 20) {
+			document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
+			document.querySelector('.dice').style.display = 'none';
+			document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');
+			document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+			gamePlaying = false;
+		} else {
+			//Next Player
+			nextPlayer();
+		}
+	}
+
+});
 
 function nextPlayer() {
 	activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
@@ -79,7 +91,7 @@ function nextPlayer() {
 	document.querySelector('.player-1-panel').classList.toggle('active');
 	document.querySelector('.dice').style.display = 'none';
 }
-	document.querySelector('.btn-new').addEventListener('click', init);
+document.querySelector('.btn-new').addEventListener('click', init);
 
 function init() {
 	gamePlaying = true;
